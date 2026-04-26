@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Precio Check IA</title>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+:root{
+  --bg:#06101f;
+  --card:#0f172a;
+  --card2:#111c31;
+  --text:#eef6ff;
+  --muted:#9fb3cc;
+  --blue:#38bdf8;
+  --blue2:#2563eb;
+  --green:#22c55e;
+  --yellow:#facc15;
+  --red:#ef4444;
+  --border:rgba(148,163,184,.22);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:linear-gradient(180deg,#020817,#0f172a);
+  color:var(--text);
+  padding:16px;
+}
+
+.app{
+  max-width:1050px;
+  margin:auto;
+}
+
+.hero{
+  background:linear-gradient(135deg,#0ea5e9,#1d4ed8);
+  border-radius:26px;
+  padding:24px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  margin-bottom:18px;
+  box-shadow:0 18px 50px rgba(37,99,235,.35);
+}
+
+.logo{
+  width:82px;
+  height:82px;
+  border-radius:22px;
+  background:rgba(2,6,23,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:44px;
+}
+
+.hero h1{
+  margin:0;
+  font-size:38px;
+}
+
+.hero p{
+  margin:6px 0 0;
+  color:#dbeafe;
+}
+
+.premium{
+  margin-left:auto;
+  border:1px solid rgba(255,255,255,.35);
+  padding:10px 16px;
+  border-radius:999px;
+  font-weight:800;
+  color:#facc15;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1.45fr .85fr;
+  gap:16px;
+}
+
+.card{
+  background:rgba(15,23,42,.92);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:22px;
+  margin-bottom:16px;
+  box-shadow:0 14px 40px rgba(0,0,0,.25);
+}
+
+h2{
+  margin:0 0 12px;
+  font-size:25px;
+}
+
+p{
+  color:#d7e3f4;
+}
+
+.price-photo{
+  height:350px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.25);
+  background:
+    linear-gradient(rgba(255,255,255,.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.14) 1px, transparent 1px),
+    linear-gradient(180deg,#151515,#050505);
+  background-size:100% 33.3%,33.3% 100%,100% 100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  margin-bottom:18px;
+}
+
+.fake-label{
+  background:#f8fafc;
+  color:#111827;
+  border:10px solid #dc2626;
+  border-radius:18px;
+  padding:24px;
+  width:78%;
+  text-align:center;
+  transform:rotate(-3deg);
+  box-shadow:0 15px 30px rgba(0,0,0,.5);
+}
+
+.fake-label .prod{
+  font-size:22px;
+  letter-spacing:2px;
+}
+
+.fake-label .price{
+  font-size:78px;
+  font-weight:900;
+  margin:8px 0;
+}
+
+.fake-label .bar{
+  height:36px;
+  background:repeating-linear-gradient(90deg,#111 0 3px,#fff 3px 7px);
+  margin:0 auto;
+  width:70%;
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1.4fr 1fr;
+  gap:16px;
+  align-items:center;
+}
+
+.icon-btn{
+  border:1px solid rgba(148,163,184,.35);
+  background:#020617;
+  color:white;
+  border-radius:20px;
+  padding:18px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.camera-btn{
+  width:98px;
+  height:98px;
+  margin:auto;
+  border-radius:50%;
+  border:7px solid white;
+  background:linear-gradient(135deg,#38bdf8,#1d4ed8);
+  color:white;
+  font-size:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  box-shadow:0 14px 35px rgba(37,99,235,.45);
+}
+
+input[type="file"]{
+  display:none;
+}
+
+.preview{
+  width:100%;
+  border-radius:18px;
+  margin-top:14px;
+  display:none;
+  border:1px solid rgba(255,255,255,.18);
+}
+
+button{
+  width:100%;
+  border:none;
+  border-radius:16px;
+  padding:17px;
+  font-size:17px;
+  font-weight:900;
+  color:white;
+  background:linear-gradient(135deg,#38bdf8,#1d4ed8);
+  cursor:pointer;
+}
+
+select,input{
+  width:100%;
+  padding:16px;
+  border-radius:16px;
+  border:1px solid rgba(148,163,184,.3);
+  background:#020617;
+  color:white;
+  font-size:16px;
+  margin-top:8px;
+}
+
+label{
+  display:block;
+  color:#bfdbfe;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.help-item{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  margin:18px 0;
+}
+
+.help-icon{
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:rgba(37,99,235,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+}
+
+.example{
+  border-radius:18px;
+  padding:12px;
+  margin-top:12px;
+}
+
+.good{
+  border:2px solid var(--green);
+}
+
+.bad{
+  border:2px solid var(--red);
+  filter:blur(1.3px);
+  opacity:.85;
+}
+
+.example-label{
+  background:#f8fafc;
+  color:#111827;
+  border:6px solid #dc2626;
+  border-radius:12px;
+  padding:12px;
+  text-align:center;
+}
+
+.example-label strong{
+  font-size:42px;
+}
+
+.ok-text{
+  color:#4ade80;
+}
+
+.bad-text{
+  color:#f87171;
+}
+
+.result{
+  display:none;
+}
+
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin:16px 0;
+}
+
+.metric{
+  background:#020617;
+  border:1px solid rgba(148,163,184,.25);
+  border-radius:18px;
+  padding:16px;
+  text-align:center;
+}
+
+.metric span{
+  display:block;
+  color:#cbd5e1;
+  font-size:14px;
+}
+
+.metric strong{
+  display:block;
+  font-size:26px;
+  margin-top:5px;
+}
+
+.status{
+  border-radius:20px;
+  padding:20px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.status.green{
+  background:rgba(34,197,94,.14);
+  border:1px solid rgba(34,197,94,.45);
+}
+
+.status.yellow{
+  background:rgba(250,204,21,.14);
+  border:1px solid rgba(250,204,21,.45);
+}
+
+.status.red{
+  background:rgba(239,68,68,.14);
+  border:1px solid rgba(239,68,68,.45);
+}
+
+.status-icon{
+  font-size:48px;
+}
+
+.status h3{
+  margin:0;
+  font-size:28px;
+}
+
+.status p{
+  margin:6px 0 0;
+}
+
+.footer{
+  text-align:center;
+  color:#94a3b8;
+  font-size:13px;
+  margin:18px 0 6px;
+}
+
+.loading{
+  display:none;
+  margin-top:12px;
+  color:#7dd3fc;
+  font-weight:800;
+}
+
+@media(max-width:800px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .hero{
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .premium{
+    margin-left:0;
+  }
+
+  .metrics{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .price-photo{
+    height:280px;
+  }
+
+  .fake-label .price{
+    font-size:56px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="hero">
+    <div class="logo">🛒</div>
+    <div>
+      <h1>Precio Check IA</h1>
+      <p>Fotografiá el precio y comparalo automáticamente.</p>
+    </div>
+    <div class="premium">⭐ Versión Premium</div>
+  </div>
+
+  <div class="grid">
+
+    <div>
+
+      <div class="card">
+        <h2>1. Tomá una foto del precio en góndola</h2>
+        <p>Enfocá el cartel o etiqueta donde figure el precio.</p>
+
+        <div class="price-photo">
+          <div class="fake-label">
+            <div class="prod">COCA COLA 2.25L RETORNABLE</div>
+            <div class="price">$ 2.900</div>
+            <div class="bar"></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <label class="icon-btn" for="foto">🖼️<br>Galería</label>
+
+          <label class="camera-btn" for="foto">📷</label>
+
+          <div class="icon-btn">🔦<br>Linterna</div>
+        </div>
+
+        <input type="file" accept="image/*" capture="environment" id="foto">
+        <img id="preview" class="preview">
+      </div>
+
+      <div class="card">
+        <h2>2. Leer el precio de la foto</h2>
+        <button onclick="leerPrecio()">▣ Leer precio de la foto</button>
+        <div id="loading" class="loading">Leyendo imagen, aguardá unos segundos...</div>
+
+        <br><br>
+        <label>También podés ingresar el precio manualmente</label>
+        <input type="number" id="precio" placeholder="Ejemplo: 2900">
+      </div>
+
+      <div class="card">
+        <h2>3. Comparar</h2>
+
+        <label>Producto</label>
+        <select id="producto">
+          <option value="2500">Coca-Cola 2.25L Retornable</option>
+          <option value="2400">Sprite 2.25L Retornable</option>
+          <option value="2400">Fanta 2.25L Retornable</option>
+          <option value="1800">Aquarius 1.5L</option>
+          <option value="1500">Powerade 500cc</option>
+          <option value="2200">Monster 473cc</option>
+        </select>
+
+        <br><br>
+        <button onclick="comparar()">📊 Comparar precio</button>
+      </div>
+
+    </div>
+
+    <div>
+
+      <div class="card">
+        <h2>¿Cómo tomar la foto?</h2>
+
+        <div class="help-item">
+          <div class="help-icon">📷</div>
+          <p>Acercate al cartel de precio.</p>
+        </div>
+
+        <div class="help-item">
+          <div class="help-icon">🎯</div>
+          <p>Enfocá bien para que sean legibles los números.</p>
+        </div>
+
+        <div class="help-item">
+          <div class="help-icon">☀️</div>
+          <p>Buena iluminación mejora la lectura.</p>
+        </div>
+
+        <h3>Ejemplo correcto:</h3>
+        <div class="example good">
+          <div class="example-label">
+            COCA COLA 2.25L<br>
+            <strong>$ 2.900</strong>
+          </div>
+        </div>
+        <p class="ok-text">Foto clara y enfocada del precio.</p>
+
+        <h3>Ejemplo incorrecto:</h3>
+        <div class="example bad">
+          <div class="example-label">
+            COCA COLA 2.25L<br>
+            <strong>$ 2.900</strong>
+          </div>
+        </div>
+        <p class="bad-text">Foto borrosa, inclinada o muy lejos.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="resultado" class="card result">
+    <h2 style="color:#60a5fa;">Resultado de la comparación</h2>
+
+    <div class="metrics">
+      <div class="metric">
+        <span>Precio visto</span>
+        <strong id="precioVisto">$0</strong>
+      </div>
+      <div class="metric">
+        <span>Precio sugerido</span>
+        <strong id="precioSugerido">$0</strong>
+      </div>
+      <div class="metric">
+        <span>Diferencia</span>
+        <strong id="diferencia">$0</strong>
+      </div>
+      <div class="metric">
+        <span>Desvío</span>
+        <strong id="desvio">0%</strong>
+      </div>
+    </div>
+
+    <div id="status" class="status">
+      <div class="status-icon" id="statusIcon">🛒</div>
+      <div>
+        <h3 id="estado">Estado</h3>
+        <p id="recomendacion">Recomendación</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    ℹ️ Precio Check IA es una herramienta orientativa para consumidores. Los precios sugeridos pueden variar según la zona y el comercio.
+  </div>
+
+</div>
+
+<script>
+const foto = document.getElementById("foto");
+const preview = document.getElementById("preview");
+
+foto.addEventListener("change", e=>{
+  const file = e.target.files[0];
+  if(file){
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  }
+});
+
+function moneda(n){
+  return "$ " + Number(n).toLocaleString("es-AR");
+}
+
+async function leerPrecio(){
+  if(!foto.files[0]){
+    alert("Primero tocá la cámara o galería y seleccioná una foto.");
+    return;
+  }
+
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("precio").value = "";
+
+  try{
+    const { data:{ text } } = await Tesseract.recognize(
+      foto.files[0],
+      "eng"
+    );
+
+    let limpio = text.replace(/\./g,"").replace(/,/g,"");
+    let numeros = limpio.match(/\d{3,6}/g);
+
+    if(numeros && numeros.length > 0){
+      let posibles = numeros
+        .map(n => Number(n))
+        .filter(n => n >= 300 && n <= 99999);
+
+      if(posibles.length > 0){
+        let precioDetectado = posibles[0];
+        document.getElementById("precio").value = precioDetectado;
+        alert("Precio detectado: " + moneda(precioDetectado));
+      }else{
+        alert("No se detectó un precio válido. Podés ingresarlo manualmente.");
+      }
+    }else{
+      alert("No se detectó precio visible. Podés ingresarlo manualmente.");
+    }
+  }catch(error){
+    alert("No se pudo leer la imagen. Probá con una foto más clara o ingresá el precio manualmente.");
+  }
+
+  document.getElementById("loading").style.display = "none";
+}
+
+function comparar(){
+  const sugerido = Number(document.getElementById("producto").value);
+  const precio = Number(document.getElementById("precio").value);
+
+  if(!precio || precio <= 0){
+    alert("Ingresá o leé un precio válido.");
+    return;
+  }
+
+  const dif = precio - sugerido;
+  const porc = (dif / sugerido) * 100;
+
+  document.getElementById("resultado").style.display = "block";
+
+  document.getElementById("precioVisto").innerText = moneda(precio);
+  document.getElementById("precioSugerido").innerText = moneda(sugerido);
+  document.getElementById("diferencia").innerText = (dif >= 0 ? "+ " : "- ") + moneda(Math.abs(dif));
+  document.getElementById("desvio").innerText = (porc >= 0 ? "+ " : "- ") + Math.abs(porc).toFixed(1) + "%";
+
+  const status = document.getElementById("status");
+  const estado = document.getElementById("estado");
+  const reco = document.getElementById("recomendacion");
+  const icon = document.getElementById("statusIcon");
+
+  status.className = "status";
+
+  if(porc <= 5){
+    status.classList.add("green");
+    icon.innerText = "✅";
+    estado.innerText = "Buen precio";
+    reco.innerText = "Este precio está dentro del rango sugerido. Es una buena opción de compra.";
+  }else if(porc <= 15){
+    status.classList.add("yellow");
+    icon.innerText = "⚠️";
+    estado.innerText = "Precio algo elevado";
+    reco.innerText = "Este precio está por encima del sugerido. Conviene comparar con otro comercio.";
+  }else{
+    status.classList.add("red");
+    icon.innerText = "📈";
+    estado.innerText = "Precio caro";
+    reco.innerText = "Este precio está muy por encima del sugerido. Recomendamos comparar antes de comprar.";
+  }
+
+  document.getElementById("resultado").scrollIntoView({behavior:"smooth"});
+}
+</script>
+
+</body>
+</html>
