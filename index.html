@@ -1,389 +1,239 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Precio Check IA</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Precio Check IA Mobile</title>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
 :root{
-  --bg:#06101f;
-  --card:#0f172a;
-  --card2:#111c31;
-  --text:#eef6ff;
-  --muted:#9fb3cc;
-  --blue:#38bdf8;
-  --blue2:#2563eb;
-  --green:#22c55e;
-  --yellow:#facc15;
-  --red:#ef4444;
-  --border:rgba(148,163,184,.22);
+--bg:#06101f;
+--card:#0f172a;
+--blue:#38bdf8;
+--blue2:#2563eb;
+--text:#eef6ff;
+--muted:#94a3b8;
+--green:#22c55e;
+--yellow:#facc15;
+--red:#ef4444;
 }
 
-*{box-sizing:border-box}
+*{
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
 
 body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:linear-gradient(180deg,#020817,#0f172a);
-  color:var(--text);
-  padding:16px;
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:linear-gradient(180deg,#020817,#0f172a);
+color:var(--text);
+padding:14px;
 }
 
 .app{
-  max-width:1050px;
-  margin:auto;
+max-width:430px;
+margin:auto;
 }
 
 .hero{
-  background:linear-gradient(135deg,#0ea5e9,#1d4ed8);
-  border-radius:26px;
-  padding:24px;
-  display:flex;
-  align-items:center;
-  gap:18px;
-  margin-bottom:18px;
-  box-shadow:0 18px 50px rgba(37,99,235,.35);
-}
-
-.logo{
-  width:82px;
-  height:82px;
-  border-radius:22px;
-  background:rgba(2,6,23,.35);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:44px;
+background:linear-gradient(135deg,#0ea5e9,#1d4ed8);
+padding:20px;
+border-radius:24px;
+box-shadow:0 18px 40px rgba(37,99,235,.35);
+margin-bottom:14px;
+text-align:center;
 }
 
 .hero h1{
-  margin:0;
-  font-size:38px;
+margin:0;
+font-size:34px;
 }
 
 .hero p{
-  margin:6px 0 0;
-  color:#dbeafe;
+margin:8px 0 0;
+font-size:14px;
+color:#dbeafe;
 }
 
-.premium{
-  margin-left:auto;
-  border:1px solid rgba(255,255,255,.35);
-  padding:10px 16px;
-  border-radius:999px;
-  font-weight:800;
-  color:#facc15;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1.45fr .85fr;
-  gap:16px;
+.badge{
+display:inline-block;
+margin-top:10px;
+padding:8px 14px;
+border-radius:999px;
+background:rgba(255,255,255,.18);
+font-size:12px;
+font-weight:800;
 }
 
 .card{
-  background:rgba(15,23,42,.92);
-  border:1px solid var(--border);
-  border-radius:24px;
-  padding:22px;
-  margin-bottom:16px;
-  box-shadow:0 14px 40px rgba(0,0,0,.25);
+background:rgba(15,23,42,.96);
+padding:16px;
+border-radius:22px;
+margin-bottom:14px;
+border:1px solid rgba(255,255,255,.08);
 }
 
 h2{
-  margin:0 0 12px;
-  font-size:25px;
-}
-
-p{
-  color:#d7e3f4;
-}
-
-.price-photo{
-  height:350px;
-  border-radius:20px;
-  border:1px solid rgba(255,255,255,.25);
-  background:
-    linear-gradient(rgba(255,255,255,.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.14) 1px, transparent 1px),
-    linear-gradient(180deg,#151515,#050505);
-  background-size:100% 33.3%,33.3% 100%,100% 100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  margin-bottom:18px;
-}
-
-.fake-label{
-  background:#f8fafc;
-  color:#111827;
-  border:10px solid #dc2626;
-  border-radius:18px;
-  padding:24px;
-  width:78%;
-  text-align:center;
-  transform:rotate(-3deg);
-  box-shadow:0 15px 30px rgba(0,0,0,.5);
-}
-
-.fake-label .prod{
-  font-size:22px;
-  letter-spacing:2px;
-}
-
-.fake-label .price{
-  font-size:78px;
-  font-weight:900;
-  margin:8px 0;
-}
-
-.fake-label .bar{
-  height:36px;
-  background:repeating-linear-gradient(90deg,#111 0 3px,#fff 3px 7px);
-  margin:0 auto;
-  width:70%;
-}
-
-.actions{
-  display:grid;
-  grid-template-columns:1fr 1.4fr 1fr;
-  gap:16px;
-  align-items:center;
-}
-
-.icon-btn{
-  border:1px solid rgba(148,163,184,.35);
-  background:#020617;
-  color:white;
-  border-radius:20px;
-  padding:18px;
-  text-align:center;
-  cursor:pointer;
-}
-
-.camera-btn{
-  width:98px;
-  height:98px;
-  margin:auto;
-  border-radius:50%;
-  border:7px solid white;
-  background:linear-gradient(135deg,#38bdf8,#1d4ed8);
-  color:white;
-  font-size:42px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  box-shadow:0 14px 35px rgba(37,99,235,.45);
-}
-
-input[type="file"]{
-  display:none;
-}
-
-.preview{
-  width:100%;
-  border-radius:18px;
-  margin-top:14px;
-  display:none;
-  border:1px solid rgba(255,255,255,.18);
-}
-
-button{
-  width:100%;
-  border:none;
-  border-radius:16px;
-  padding:17px;
-  font-size:17px;
-  font-weight:900;
-  color:white;
-  background:linear-gradient(135deg,#38bdf8,#1d4ed8);
-  cursor:pointer;
-}
-
-select,input{
-  width:100%;
-  padding:16px;
-  border-radius:16px;
-  border:1px solid rgba(148,163,184,.3);
-  background:#020617;
-  color:white;
-  font-size:16px;
-  margin-top:8px;
+margin:0 0 12px;
+font-size:22px;
 }
 
 label{
-  display:block;
-  color:#bfdbfe;
-  font-weight:800;
-  margin-bottom:12px;
+display:block;
+font-size:13px;
+font-weight:800;
+margin-bottom:8px;
+color:#bfdbfe;
 }
 
-.help-item{
-  display:flex;
-  gap:14px;
-  align-items:flex-start;
-  margin:18px 0;
+select,input{
+width:100%;
+padding:16px;
+border-radius:16px;
+border:1px solid rgba(255,255,255,.12);
+background:#020617;
+color:white;
+font-size:16px;
+margin-bottom:12px;
 }
 
-.help-icon{
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  background:rgba(37,99,235,.35);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:25px;
+button{
+width:100%;
+border:none;
+padding:16px;
+border-radius:16px;
+font-size:17px;
+font-weight:900;
+color:white;
+background:linear-gradient(135deg,var(--blue),var(--blue2));
+margin-bottom:10px;
+cursor:pointer;
 }
 
-.example{
-  border-radius:18px;
-  padding:12px;
-  margin-top:12px;
+.capture-box{
+height:250px;
+border-radius:22px;
+background:linear-gradient(180deg,#0b1220,#020617);
+border:1px dashed rgba(255,255,255,.18);
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+text-align:center;
+padding:20px;
+margin-bottom:14px;
 }
 
-.good{
-  border:2px solid var(--green);
+.capture-box span{
+font-size:58px;
+margin-bottom:10px;
 }
 
-.bad{
-  border:2px solid var(--red);
-  filter:blur(1.3px);
-  opacity:.85;
+.capture-box p{
+margin:0;
+color:#cbd5e1;
+font-size:14px;
+line-height:1.4;
 }
 
-.example-label{
-  background:#f8fafc;
-  color:#111827;
-  border:6px solid #dc2626;
-  border-radius:12px;
-  padding:12px;
-  text-align:center;
+.camera-btn{
+width:90px;
+height:90px;
+border-radius:50%;
+margin:auto;
+background:linear-gradient(135deg,#38bdf8,#1d4ed8);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:40px;
+border:6px solid white;
+box-shadow:0 14px 30px rgba(37,99,235,.35);
+cursor:pointer;
 }
 
-.example-label strong{
-  font-size:42px;
+input[type=file]{
+display:none;
 }
 
-.ok-text{
-  color:#4ade80;
+img{
+width:100%;
+border-radius:18px;
+display:none;
+margin-top:12px;
 }
 
-.bad-text{
-  color:#f87171;
+.tip{
+font-size:13px;
+color:#cbd5e1;
+line-height:1.45;
+margin-top:6px;
 }
 
 .result{
-  display:none;
+display:none;
 }
 
 .metrics{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin:16px 0;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-bottom:12px;
 }
 
 .metric{
-  background:#020617;
-  border:1px solid rgba(148,163,184,.25);
-  border-radius:18px;
-  padding:16px;
-  text-align:center;
+background:#020617;
+padding:14px;
+border-radius:16px;
+text-align:center;
+border:1px solid rgba(255,255,255,.08);
 }
 
 .metric span{
-  display:block;
-  color:#cbd5e1;
-  font-size:14px;
+display:block;
+font-size:12px;
+color:#94a3b8;
+margin-bottom:5px;
 }
 
 .metric strong{
-  display:block;
-  font-size:26px;
-  margin-top:5px;
+font-size:22px;
 }
 
 .status{
-  border-radius:20px;
-  padding:20px;
-  display:flex;
-  align-items:center;
-  gap:18px;
+padding:18px;
+border-radius:18px;
 }
 
 .status.green{
-  background:rgba(34,197,94,.14);
-  border:1px solid rgba(34,197,94,.45);
+background:rgba(34,197,94,.14);
 }
 
 .status.yellow{
-  background:rgba(250,204,21,.14);
-  border:1px solid rgba(250,204,21,.45);
+background:rgba(250,204,21,.14);
 }
 
 .status.red{
-  background:rgba(239,68,68,.14);
-  border:1px solid rgba(239,68,68,.45);
-}
-
-.status-icon{
-  font-size:48px;
+background:rgba(239,68,68,.14);
 }
 
 .status h3{
-  margin:0;
-  font-size:28px;
+margin:0;
+font-size:26px;
 }
 
 .status p{
-  margin:6px 0 0;
+margin:8px 0 0;
+line-height:1.45;
 }
 
 .footer{
-  text-align:center;
-  color:#94a3b8;
-  font-size:13px;
-  margin:18px 0 6px;
-}
-
-.loading{
-  display:none;
-  margin-top:12px;
-  color:#7dd3fc;
-  font-weight:800;
-}
-
-@media(max-width:800px){
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .hero{
-    flex-direction:column;
-    text-align:center;
-  }
-
-  .premium{
-    margin-left:0;
-  }
-
-  .metrics{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .price-photo{
-    height:280px;
-  }
-
-  .fake-label .price{
-    font-size:56px;
-  }
+text-align:center;
+font-size:12px;
+color:#94a3b8;
+padding:8px 0 20px;
 }
 </style>
 </head>
@@ -392,252 +242,189 @@ label{
 
 <div class="app">
 
-  <div class="hero">
-    <div class="logo">🛒</div>
-    <div>
-      <h1>Precio Check IA</h1>
-      <p>Fotografiá el precio y comparalo automáticamente.</p>
-    </div>
-    <div class="premium">⭐ Versión Premium</div>
-  </div>
+<div class="hero">
+<h1>Precio Check IA</h1>
+<p>Escaneá el precio y comparalo al instante</p>
+<div class="badge">Versión Mobile Premium</div>
+</div>
 
-  <div class="grid">
+<div class="card">
 
-    <div>
+<h2>1. Sacar Foto</h2>
 
-      <div class="card">
-        <h2>1. Tomá una foto del precio en góndola</h2>
-        <p>Enfocá el cartel o etiqueta donde figure el precio.</p>
+<div class="capture-box">
+<span>📷</span>
+<p>Apuntá al cartel de precio<br>en góndola o heladera</p>
+</div>
 
-        <div class="price-photo">
-          <div class="fake-label">
-            <div class="prod">COCA COLA 2.25L RETORNABLE</div>
-            <div class="price">$ 2.900</div>
-            <div class="bar"></div>
-          </div>
-        </div>
+<label class="camera-btn" for="foto">📸</label>
+<input type="file" accept="image/*" capture="environment" id="foto">
 
-        <div class="actions">
-          <label class="icon-btn" for="foto">🖼️<br>Galería</label>
+<img id="preview">
 
-          <label class="camera-btn" for="foto">📷</label>
+<div class="tip">
+Consejo: acercate bien al cartel y enfocá los números.
+</div>
 
-          <div class="icon-btn">🔦<br>Linterna</div>
-        </div>
+</div>
 
-        <input type="file" accept="image/*" capture="environment" id="foto">
-        <img id="preview" class="preview">
-      </div>
+<div class="card">
 
-      <div class="card">
-        <h2>2. Leer el precio de la foto</h2>
-        <button onclick="leerPrecio()">▣ Leer precio de la foto</button>
-        <div id="loading" class="loading">Leyendo imagen, aguardá unos segundos...</div>
+<h2>2. Leer Precio</h2>
 
-        <br><br>
-        <label>También podés ingresar el precio manualmente</label>
-        <input type="number" id="precio" placeholder="Ejemplo: 2900">
-      </div>
+<button onclick="leerPrecio()">🔍 Leer precio de la foto</button>
 
-      <div class="card">
-        <h2>3. Comparar</h2>
+<label>Precio detectado / manual</label>
+<input type="number" id="precio" placeholder="Ejemplo: 2900">
 
-        <label>Producto</label>
-        <select id="producto">
-          <option value="2500">Coca-Cola 2.25L Retornable</option>
-          <option value="2400">Sprite 2.25L Retornable</option>
-          <option value="2400">Fanta 2.25L Retornable</option>
-          <option value="1800">Aquarius 1.5L</option>
-          <option value="1500">Powerade 500cc</option>
-          <option value="2200">Monster 473cc</option>
-        </select>
+</div>
 
-        <br><br>
-        <button onclick="comparar()">📊 Comparar precio</button>
-      </div>
+<div class="card">
 
-    </div>
+<h2>3. Comparar</h2>
 
-    <div>
+<label>Producto</label>
+<select id="producto">
+<option value="2500">Coca-Cola 2.25L</option>
+<option value="2400">Sprite 2.25L</option>
+<option value="2400">Fanta 2.25L</option>
+<option value="1800">Aquarius 1.5L</option>
+<option value="1500">Powerade 500cc</option>
+<option value="2200">Monster 473cc</option>
+</select>
 
-      <div class="card">
-        <h2>¿Cómo tomar la foto?</h2>
+<button onclick="comparar()">📊 Comparar precio</button>
 
-        <div class="help-item">
-          <div class="help-icon">📷</div>
-          <p>Acercate al cartel de precio.</p>
-        </div>
+</div>
 
-        <div class="help-item">
-          <div class="help-icon">🎯</div>
-          <p>Enfocá bien para que sean legibles los números.</p>
-        </div>
+<div id="resultado" class="card result">
 
-        <div class="help-item">
-          <div class="help-icon">☀️</div>
-          <p>Buena iluminación mejora la lectura.</p>
-        </div>
+<h2>Resultado</h2>
 
-        <h3>Ejemplo correcto:</h3>
-        <div class="example good">
-          <div class="example-label">
-            COCA COLA 2.25L<br>
-            <strong>$ 2.900</strong>
-          </div>
-        </div>
-        <p class="ok-text">Foto clara y enfocada del precio.</p>
+<div class="metrics">
+<div class="metric">
+<span>Precio visto</span>
+<strong id="pv">$0</strong>
+</div>
 
-        <h3>Ejemplo incorrecto:</h3>
-        <div class="example bad">
-          <div class="example-label">
-            COCA COLA 2.25L<br>
-            <strong>$ 2.900</strong>
-          </div>
-        </div>
-        <p class="bad-text">Foto borrosa, inclinada o muy lejos.</p>
-      </div>
+<div class="metric">
+<span>Sugerido</span>
+<strong id="ps">$0</strong>
+</div>
 
-    </div>
+<div class="metric">
+<span>Diferencia</span>
+<strong id="df">$0</strong>
+</div>
 
-  </div>
+<div class="metric">
+<span>Desvío</span>
+<strong id="dv">0%</strong>
+</div>
+</div>
 
-  <div id="resultado" class="card result">
-    <h2 style="color:#60a5fa;">Resultado de la comparación</h2>
+<div id="status" class="status">
+<h3 id="estado">Estado</h3>
+<p id="reco">Mensaje</p>
+</div>
 
-    <div class="metrics">
-      <div class="metric">
-        <span>Precio visto</span>
-        <strong id="precioVisto">$0</strong>
-      </div>
-      <div class="metric">
-        <span>Precio sugerido</span>
-        <strong id="precioSugerido">$0</strong>
-      </div>
-      <div class="metric">
-        <span>Diferencia</span>
-        <strong id="diferencia">$0</strong>
-      </div>
-      <div class="metric">
-        <span>Desvío</span>
-        <strong id="desvio">0%</strong>
-      </div>
-    </div>
+</div>
 
-    <div id="status" class="status">
-      <div class="status-icon" id="statusIcon">🛒</div>
-      <div>
-        <h3 id="estado">Estado</h3>
-        <p id="recomendacion">Recomendación</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer">
-    ℹ️ Precio Check IA es una herramienta orientativa para consumidores. Los precios sugeridos pueden variar según la zona y el comercio.
-  </div>
+<div class="footer">
+Precio Check IA · App orientativa para consumidores
+</div>
 
 </div>
 
 <script>
-const foto = document.getElementById("foto");
-const preview = document.getElementById("preview");
+const foto=document.getElementById("foto");
+const preview=document.getElementById("preview");
 
-foto.addEventListener("change", e=>{
-  const file = e.target.files[0];
-  if(file){
-    preview.src = URL.createObjectURL(file);
-    preview.style.display = "block";
-  }
+foto.addEventListener("change",e=>{
+const file=e.target.files[0];
+if(file){
+preview.src=URL.createObjectURL(file);
+preview.style.display="block";
+}
 });
 
-function moneda(n){
-  return "$ " + Number(n).toLocaleString("es-AR");
+function money(n){
+return "$"+Number(n).toLocaleString("es-AR");
 }
 
 async function leerPrecio(){
-  if(!foto.files[0]){
-    alert("Primero tocá la cámara o galería y seleccioná una foto.");
-    return;
-  }
 
-  document.getElementById("loading").style.display = "block";
-  document.getElementById("precio").value = "";
+if(!foto.files[0]){
+alert("Sacá una foto primero.");
+return;
+}
 
-  try{
-    const { data:{ text } } = await Tesseract.recognize(
-      foto.files[0],
-      "eng"
-    );
+alert("Leyendo precio...");
 
-    let limpio = text.replace(/\./g,"").replace(/,/g,"");
-    let numeros = limpio.match(/\d{3,6}/g);
+try{
+const {data:{text}}=await Tesseract.recognize(
+foto.files[0],
+"eng"
+);
 
-    if(numeros && numeros.length > 0){
-      let posibles = numeros
-        .map(n => Number(n))
-        .filter(n => n >= 300 && n <= 99999);
+let limpio=text.replace(/\./g,"").replace(/,/g,"");
+let nums=limpio.match(/\d{3,6}/g);
 
-      if(posibles.length > 0){
-        let precioDetectado = posibles[0];
-        document.getElementById("precio").value = precioDetectado;
-        alert("Precio detectado: " + moneda(precioDetectado));
-      }else{
-        alert("No se detectó un precio válido. Podés ingresarlo manualmente.");
-      }
-    }else{
-      alert("No se detectó precio visible. Podés ingresarlo manualmente.");
-    }
-  }catch(error){
-    alert("No se pudo leer la imagen. Probá con una foto más clara o ingresá el precio manualmente.");
-  }
+if(nums && nums.length){
+document.getElementById("precio").value=nums[0];
+alert("Precio detectado: "+money(nums[0]));
+}else{
+alert("No se detectó precio.");
+}
+}catch(e){
+alert("No se pudo leer.");
+}
 
-  document.getElementById("loading").style.display = "none";
 }
 
 function comparar(){
-  const sugerido = Number(document.getElementById("producto").value);
-  const precio = Number(document.getElementById("precio").value);
 
-  if(!precio || precio <= 0){
-    alert("Ingresá o leé un precio válido.");
-    return;
-  }
+let precio=Number(document.getElementById("precio").value);
+let sugerido=Number(document.getElementById("producto").value);
 
-  const dif = precio - sugerido;
-  const porc = (dif / sugerido) * 100;
+if(!precio){
+alert("Ingresá precio.");
+return;
+}
 
-  document.getElementById("resultado").style.display = "block";
+let dif=precio-sugerido;
+let porc=(dif/sugerido)*100;
 
-  document.getElementById("precioVisto").innerText = moneda(precio);
-  document.getElementById("precioSugerido").innerText = moneda(sugerido);
-  document.getElementById("diferencia").innerText = (dif >= 0 ? "+ " : "- ") + moneda(Math.abs(dif));
-  document.getElementById("desvio").innerText = (porc >= 0 ? "+ " : "- ") + Math.abs(porc).toFixed(1) + "%";
+document.getElementById("resultado").style.display="block";
 
-  const status = document.getElementById("status");
-  const estado = document.getElementById("estado");
-  const reco = document.getElementById("recomendacion");
-  const icon = document.getElementById("statusIcon");
+document.getElementById("pv").innerText=money(precio);
+document.getElementById("ps").innerText=money(sugerido);
+document.getElementById("df").innerText=(dif>=0?"+":"-")+money(Math.abs(dif));
+document.getElementById("dv").innerText=(porc>=0?"+":"-")+Math.abs(porc).toFixed(1)+"%";
 
-  status.className = "status";
+let status=document.getElementById("status");
+let estado=document.getElementById("estado");
+let reco=document.getElementById("reco");
 
-  if(porc <= 5){
-    status.classList.add("green");
-    icon.innerText = "✅";
-    estado.innerText = "Buen precio";
-    reco.innerText = "Este precio está dentro del rango sugerido. Es una buena opción de compra.";
-  }else if(porc <= 15){
-    status.classList.add("yellow");
-    icon.innerText = "⚠️";
-    estado.innerText = "Precio algo elevado";
-    reco.innerText = "Este precio está por encima del sugerido. Conviene comparar con otro comercio.";
-  }else{
-    status.classList.add("red");
-    icon.innerText = "📈";
-    estado.innerText = "Precio caro";
-    reco.innerText = "Este precio está muy por encima del sugerido. Recomendamos comparar antes de comprar.";
-  }
+status.className="status";
 
-  document.getElementById("resultado").scrollIntoView({behavior:"smooth"});
+if(porc<=5){
+status.classList.add("green");
+estado.innerText="Buen precio";
+reco.innerText="Está dentro del rango recomendado.";
+}
+else if(porc<=15){
+status.classList.add("yellow");
+estado.innerText="Algo elevado";
+reco.innerText="Conviene comparar con otro comercio.";
+}
+else{
+status.classList.add("red");
+estado.innerText="Precio caro";
+reco.innerText="Está muy por encima del sugerido.";
+}
+
+document.getElementById("resultado").scrollIntoView({behavior:"smooth"});
 }
 </script>
 
